@@ -2,11 +2,15 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "shader_s.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void processInput(GLFWwindow* window);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -28,7 +32,7 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -39,6 +43,7 @@ int main() {
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// shader class here
+	Shader ourShader("shader.vs", "shader.fs");
 
 	float vertices[] {
 		-1.0f, -1.0f, 0.0f,
@@ -60,24 +65,27 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	ourShader.use();
+
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// input process
+		processInput(window);
 
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// activate shader
+		ourShader.use();
 
 		// texture units
 
 		// matrices
 
 		glBindVertexArray(VAO);
-		// draw elements
+		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
@@ -94,4 +102,10 @@ int main() {
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
+}
+
+void processInput(GLFWwindow* window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
 }
