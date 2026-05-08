@@ -4,6 +4,7 @@
 
 #include "shader_s.h"
 #include "Background.h"
+#include "Apple.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -47,6 +48,7 @@ int main() {
 	Shader ourShader("shader.vs", "shader.fs");
 
 	Background bg;
+	Apple ap;
 	
 	
 	
@@ -97,6 +99,10 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 		glBindVertexArray(0);
 
+		glBindVertexArray(ap.getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
+		glBindVertexArray(0);
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -104,6 +110,7 @@ int main() {
 	//glDeleteVertexArrays(1, &VAO);
 	//glDeleteBuffers(1, &VBO);
 	bg.deleteObjects();
+	ap.deleteObjects();
 
 	glfwTerminate();
 
