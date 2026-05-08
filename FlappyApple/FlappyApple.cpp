@@ -49,34 +49,21 @@ int main() {
 
 	Background bg;
 	Apple ap;
-	
-	
-	
-
-	//float vertices[] {
-	//	-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-	//	-1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-	//	 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-
-	//	 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-	//	 1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-	//	-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f
-	//};
-
-	//unsigned int VAO, VBO;
-	//glGenVertexArrays(1, &VAO);
-	//glBindVertexArray(VAO);
-	//glGenBuffers(1, &VBO);
-	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	//glEnableVertexAttribArray(1);
-	
 
 	ourShader.use();
+
+	glm::mat4 view = glm::mat4(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.4f, 0.0f));
+	int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	
+	glm::mat4 projection;
+	projection = glm::ortho(-(float(SCR_WIDTH) / float(SCR_HEIGHT)), float(SCR_WIDTH) / float(SCR_HEIGHT), -1.0f, 1.0f, -1.0f, 1.0f);
+	int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
@@ -95,10 +82,11 @@ int main() {
 
 		// matrices
 
+		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
 		glBindVertexArray(bg.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
-		//glBindVertexArray(0);
 
+		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
 		glBindVertexArray(ap.getVAO());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -107,8 +95,6 @@ int main() {
 		glfwPollEvents();
 
 	}
-	//glDeleteVertexArrays(1, &VAO);
-	//glDeleteBuffers(1, &VBO);
 	bg.deleteObjects();
 	ap.deleteObjects();
 
