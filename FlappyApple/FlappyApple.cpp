@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shader_s.h"
+#include "Background.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -45,27 +46,32 @@ int main() {
 	// shader class here
 	Shader ourShader("shader.vs", "shader.fs");
 
-	float vertices[] {
-		-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-		-1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-		 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
+	Background bg;
+	
+	
+	
 
-		 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-		 1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
-		-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f
-	};
+	//float vertices[] {
+	//	-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
+	//	-1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
+	//	 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
 
-	unsigned int VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//	 1.0f,  1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
+	//	 1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f,
+	//	-1.0f, -1.0f, 0.0f, 0.53f, 0.81f, 0.92f
+	//};
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
+	//unsigned int VAO, VBO;
+	//glGenVertexArrays(1, &VAO);
+	//glBindVertexArray(VAO);
+	//glGenBuffers(1, &VBO);
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	//glEnableVertexAttribArray(0);
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	//glEnableVertexAttribArray(1);
 	
 
 	ourShader.use();
@@ -87,7 +93,7 @@ int main() {
 
 		// matrices
 
-		glBindVertexArray(VAO);
+		glBindVertexArray(bg.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 		glBindVertexArray(0);
 
@@ -95,8 +101,9 @@ int main() {
 		glfwPollEvents();
 
 	}
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	//glDeleteVertexArrays(1, &VAO);
+	//glDeleteBuffers(1, &VBO);
+	bg.deleteObjects();
 
 	glfwTerminate();
 
