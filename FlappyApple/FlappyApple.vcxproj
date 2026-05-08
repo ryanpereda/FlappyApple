@@ -133,6 +133,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Apple.h" />
+    <ClInclude Include="Background.h" />
     <ClInclude Include="shader_s.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>
