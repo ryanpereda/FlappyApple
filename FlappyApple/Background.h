@@ -33,9 +33,6 @@ public:
 	int getVAO() {
 		return VAO;
 	}
-	//int getVBO() {
-	//	return VBO;
-	//}
 	void deleteObjects() {
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);

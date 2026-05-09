@@ -5,6 +5,7 @@
 #include "shader_s.h"
 #include "Background.h"
 #include "Apple.h"
+#include "Wall.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -49,6 +50,7 @@ int main() {
 
 	Background bg;
 	Apple ap;
+	Wall wall;
 
 	ourShader.use();
 
@@ -61,9 +63,6 @@ int main() {
 	projection = glm::ortho(-(float(SCR_WIDTH) / float(SCR_HEIGHT)), float(SCR_WIDTH) / float(SCR_HEIGHT), -1.0f, 1.0f, -1.0f, 1.0f);
 	int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-	
-	
 
 	while (!glfwWindowShouldClose(window)) {
 		float currentFrame = glfwGetTime();
@@ -84,6 +83,9 @@ int main() {
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
 		glBindVertexArray(bg.getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
+
+		glBindVertexArray(wall.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
