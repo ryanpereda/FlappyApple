@@ -10,7 +10,7 @@ out vec3 ourColor;
 void main()
 {
 	if (obj == 1) {
-		gl_Position =  projection * view * vec4(aPos, 1.0);
+		gl_Position =  projection * vec4(aPos, 1.0);
 	} else {
 		gl_Position =  vec4(aPos, 1.0);
 	}

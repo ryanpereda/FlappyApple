@@ -60,7 +60,7 @@ int main() {
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	
 	glm::mat4 projection;
-	projection = glm::ortho(-(float(SCR_WIDTH) / float(SCR_HEIGHT)), float(SCR_WIDTH) / float(SCR_HEIGHT), -1.0f, 1.0f, -1.0f, 1.0f);
+	projection = glm::ortho(0.0f, float(SCR_WIDTH), float(SCR_HEIGHT), 0.0f, -1.0f, 1.0f);
 	int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
