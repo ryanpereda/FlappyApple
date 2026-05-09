@@ -14,12 +14,19 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+
+float vVelocity = 0.0f;
+const float H_VELOCITY = 0.1f;
+const float GRAVITY = -0.5f;
+const float MAX_V_VELOCITY = 10.0f;
+const float MIN_V_VELOCITY = -10.0f;
 
 int main() {
 	glfwInit();
@@ -54,10 +61,13 @@ int main() {
 
 	ourShader.use();
 
-	glm::mat4 view = glm::mat4(1.0f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.4f, 0.0f));
-	int viewLoc = glGetUniformLocation(ourShader.ID, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glm::mat4 vMovement = glm::mat4(1.0f);
+	int vMovementLoc = glGetUniformLocation(ourShader.ID, "vMovement");
+	
+
+	glm::mat4 hMovement = glm::mat4(1.0f);
+	int hMovementLoc = glGetUniformLocation(ourShader.ID, "hMovement");
+	
 	
 	glm::mat4 projection;
 	projection = glm::ortho(0.0f, float(SCR_WIDTH), float(SCR_HEIGHT), 0.0f, -1.0f, 1.0f);
@@ -80,18 +90,17 @@ int main() {
 		// texture units
 
 		// matrices
+		applyMovement(vMovement, vMovementLoc, hMovement, hMovementLoc);
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
 		glBindVertexArray(bg.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 
-		
-
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
-
 		glBindVertexArray(wall.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
 
+		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 2);
 		glBindVertexArray(ap.getVAO());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
@@ -116,4 +125,12 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+}
+
+void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc) {
+	vMovement = glm::translate(vMovement, glm::vec3(0.0f, 100.0f, 0.0f));
+	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
+
+	hMovement = glm::translate(hMovement, glm::vec3(100.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(hMovementLoc, 1, GL_FALSE, glm::value_ptr(hMovement));
 }
