@@ -85,10 +85,13 @@ int main() {
 		glBindVertexArray(bg.getVAO());
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 
-		glBindVertexArray(wall.getVAO());
-		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
+		
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
+
+		glBindVertexArray(wall.getVAO());
+		glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
+
 		glBindVertexArray(ap.getVAO());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

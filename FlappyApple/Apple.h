@@ -12,7 +12,7 @@ public:
 	Apple() {
 		float centerX = 640.0f;
 		float centerY = 360.0f;
-		float width = 75.0 / 2.0;
+		float width = 75.0f / 2.0f; // also height
 
 		float vertices[]{
 			centerX - width, centerY - width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left

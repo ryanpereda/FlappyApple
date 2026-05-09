@@ -9,14 +9,29 @@ public:
 	unsigned int VAO, VBO;
 
 	Wall() {
-		float vertices[]{
-			0.8f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.8f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.9f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		float width = 75.0f;
+		float coordX = 1000.0f;
+		float minY = 0.0f;
+		float maxY = 720.0f;
+		float height = 360.0f - 125.0f;
 
-			0.8f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.9f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.9f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		float vertices[]{
+			coordX, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+			coordX, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+
+			coordX, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+
+
+			coordX, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+			coordX, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+
+			coordX, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+			coordX + width, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
 		};
 		glGenVertexArrays(1, &VAO);
 		glBindVertexArray(VAO);
