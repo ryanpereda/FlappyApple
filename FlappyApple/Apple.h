@@ -4,16 +4,21 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+
 class Apple {
 public:
 	unsigned int VAO, VBO, EBO;
 
 	Apple() {
+		float centerX = 640.0f;
+		float centerY = 360.0f;
+		float width = 75.0 / 2.0;
+
 		float vertices[]{
-			100.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-			100.0f, 200.0f, 0.0f, 1.0f, 0.0f, 0.0f, // top left
-			200.0f, 100.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-			200.0f, 200.0f, 0.0f, 1.0f, 0.0f, 0.0f, // top right
+			centerX - width, centerY - width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+			centerX - width, centerY + width, 0.0f, 1.0f, 0.0f, 0.0f, // top left
+			centerX + width, centerY - width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+			centerX + width, centerY + width, 0.0f, 1.0f, 0.0f, 0.0f, // top right
 		};
 
 		unsigned int indices[] = {
