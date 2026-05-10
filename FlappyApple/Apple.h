@@ -11,14 +11,15 @@ public:
 
 	Apple() {
 		float centerX = 640.0f;
-		float centerY = 360.0f;
-		float width = 75.0f / 2.0f; // also height
+		float startingY = 720.0f;
+		float height = 75.0f;
+		float width = height / 2.0f; 
 
 		float vertices[]{
-			centerX - width, centerY - width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-			centerX - width, centerY + width, 0.0f, 1.0f, 0.0f, 0.0f, // top left
-			centerX + width, centerY - width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
-			centerX + width, centerY + width, 0.0f, 1.0f, 0.0f, 0.0f, // top right
+			centerX - width, startingY, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+			centerX - width, startingY - height, 0.0f, 1.0f, 0.0f, 0.0f, // top left
+			centerX + width, startingY, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
+			centerX + width, startingY - height, 0.0f, 1.0f, 0.0f, 0.0f, // top right
 		};
 
 		unsigned int indices[] = {

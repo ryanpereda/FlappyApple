@@ -128,7 +128,7 @@ void processInput(GLFWwindow* window) {
 }
 
 void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc) {
-	vMovement = glm::translate(vMovement, glm::vec3(0.0f, 100.0f, 0.0f));
+	vMovement = glm::translate(vMovement, glm::vec3(0.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
 
 	hMovement = glm::translate(hMovement, glm::vec3(100.0f, 0.0f, 0.0f));
