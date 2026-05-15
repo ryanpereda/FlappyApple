@@ -15,6 +15,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc);
+void applyGravity();
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -23,10 +24,11 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 float vVelocity = 0.0f;
+float vPosition = SCR_HEIGHT / 2;
 const float H_VELOCITY = 0.1f;
-const float GRAVITY = -0.5f;
-const float MAX_V_VELOCITY = 10.0f;
-const float MIN_V_VELOCITY = -10.0f;
+const float GRAVITY = -500.0f;
+const float MAX_V_VELOCITY = 250.0f;
+const float MIN_V_VELOCITY = -250.0f;
 
 int main() {
 	glfwInit();
@@ -91,6 +93,7 @@ int main() {
 
 		// matrices
 		applyMovement(vMovement, vMovementLoc, hMovement, hMovementLoc);
+		applyGravity();
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
 		glBindVertexArray(bg.getVAO());
@@ -125,12 +128,35 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+	else if (glfwGetKey(window, GLFW_KEY_SPACE)) {
+		vVelocity += -GRAVITY;
+		if (vVelocity > MAX_V_VELOCITY) {
+			vVelocity = MAX_V_VELOCITY;
+		}
+	}
 }
 
 void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc) {
-	vMovement = glm::translate(vMovement, glm::vec3(0.0f, 0.0f, 0.0f));
+	vPosition += vVelocity * deltaTime;
+	if (vPosition < 32.0f) {
+		vPosition = 32.0f;
+	}
+	else if (vPosition > 720.0f - 32.0f) {
+		vPosition = 720.0f - 32.0f;
+	}
+
+	vMovement = glm::translate(vMovement, glm::vec3(0.0f, -vPosition, 0.0f));
 	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
 
 	hMovement = glm::translate(hMovement, glm::vec3(100.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(hMovementLoc, 1, GL_FALSE, glm::value_ptr(hMovement));
+}
+
+void applyGravity() {
+	if (vVelocity > MIN_V_VELOCITY) {
+		vVelocity += GRAVITY * deltaTime;
+	}
+	else {
+		vVelocity = MIN_V_VELOCITY;
+	}
 }
