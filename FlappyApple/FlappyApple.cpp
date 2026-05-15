@@ -14,6 +14,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc);
 void applyGravity();
 
@@ -82,6 +83,7 @@ int main() {
 		lastFrame = currentFrame;
 
 		processInput(window);
+		glfwSetKeyCallback(window, keyCallback);
 
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -128,7 +130,10 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
-	else if (glfwGetKey(window, GLFW_KEY_SPACE)) {
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
 		vVelocity += -GRAVITY;
 		if (vVelocity > MAX_V_VELOCITY) {
 			vVelocity = MAX_V_VELOCITY;
