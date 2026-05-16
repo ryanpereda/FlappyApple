@@ -7,13 +7,15 @@
 class Wall {
 public:
 	unsigned int VAO, VBO;
+	float hPosition;
 
 	Wall() {
 		float width = 75.0f;
-		float coordX = 1000.0f;
+		float coordX = 1300.0f;
 		float minY = 0.0f;
 		float maxY = 720.0f;
 		float height = 360.0f - 125.0f;
+		hPosition = 0.0f;
 
 		float vertices[]{
 			coordX, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left

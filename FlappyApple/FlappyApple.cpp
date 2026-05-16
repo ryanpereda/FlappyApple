@@ -1,4 +1,5 @@
 #include <iostream>
+#include <deque>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -15,7 +16,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc);
+void applyVMovement(glm::mat4 vMovement, int vMovementLoc);
+void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
 void applyGravity();
 
 const unsigned int SCR_WIDTH = 1280;
@@ -26,7 +28,7 @@ float lastFrame = 0.0f;
 
 float vVelocity = 0.0f;
 float vPosition = SCR_HEIGHT / 2;
-const float H_VELOCITY = 0.1f;
+const float H_VELOCITY = 200.0f;
 const float GRAVITY = -500.0f;
 const float MAX_V_VELOCITY = 250.0f;
 const float MIN_V_VELOCITY = -250.0f;
@@ -60,7 +62,8 @@ int main() {
 
 	Background bg;
 	Apple ap;
-	Wall wall;
+	std::deque<Wall> walls;
+	walls.push_back(Wall());
 
 	ourShader.use();
 
@@ -94,7 +97,7 @@ int main() {
 		// texture units
 
 		// matrices
-		applyMovement(vMovement, vMovementLoc, hMovement, hMovementLoc);
+		applyVMovement(vMovement, vMovementLoc);
 		applyGravity();
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
@@ -102,8 +105,18 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
-		glBindVertexArray(wall.getVAO());
-		glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
+		for (int i = 0; i < walls.size(); i++) {
+			applyHMovement(hMovement, hMovementLoc, walls[i]);
+			if (walls[i].hPosition > 1400.0f) {
+				walls[i].deleteObjects();
+				walls.pop_front();
+			}
+			glBindVertexArray(walls[i].getVAO());
+			glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
+		}
+		if (walls[0].hPosition > 700.0f && walls.size() == 1) {
+			walls.push_back(Wall());
+		}
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 2);
 		glBindVertexArray(ap.getVAO());
@@ -141,7 +154,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 }
 
-void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, int hMovementLoc) {
+void applyVMovement(glm::mat4 vMovement, int vMovementLoc) {
 	vPosition += vVelocity * deltaTime;
 	if (vPosition < 32.0f) {
 		vPosition = 32.0f;
@@ -152,8 +165,12 @@ void applyMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 hMovement, i
 
 	vMovement = glm::translate(vMovement, glm::vec3(0.0f, -vPosition, 0.0f));
 	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
+}
 
-	hMovement = glm::translate(hMovement, glm::vec3(100.0f, 0.0f, 0.0f));
+void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall) {
+	wall.hPosition += H_VELOCITY * deltaTime;
+
+	hMovement = glm::translate(hMovement, glm::vec3(-wall.hPosition, 0.0f, 0.0f));
 	glUniformMatrix4fv(hMovementLoc, 1, GL_FALSE, glm::value_ptr(hMovement));
 }
 
