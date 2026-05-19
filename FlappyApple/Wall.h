@@ -3,6 +3,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <random>
 
 class Wall {
 public:
@@ -16,23 +17,29 @@ public:
 		float maxY = 720.0f;
 		float height = 360.0f - 125.0f;
 		hPosition = 0.0f;
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> distr(0, 600);
+		float rand = float(distr(gen));
+		rand -= 300.0f;
 
 		float vertices[]{
+			// top wall
 			coordX, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-			coordX, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
 			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
 
-			coordX, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
-			coordX + width, minY + height, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top right
 			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
 
-
+			// bottom wall
 			coordX, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-			coordX, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX, maxY - height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
 			coordX + width, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
 
-			coordX, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top left
-			coordX + width, maxY - height, 0.0f, 0.0f, 1.0f, 0.0f, // top right
+			coordX, maxY - height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX + width, maxY - height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top right
 			coordX + width, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
 		};
 		glGenVertexArrays(1, &VAO);
