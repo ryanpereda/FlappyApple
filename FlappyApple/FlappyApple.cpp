@@ -110,12 +110,13 @@ int main() {
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
 		for (int i = 0; i < walls.size(); i++) {
 			applyHMovement(hMovement, hMovementLoc, walls[i]);
-			if (walls[i].hPosition > 1400.0f) {
-				walls[i].deleteObjects();
-				walls.pop_front();
-			}
+			
 			glBindVertexArray(walls[i].getVAO());
 			glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
+		}
+		if (walls[0].hPosition > 1400.0f) {
+			walls[0].deleteObjects();
+			walls.pop_front();
 		}
 		if (walls[0].hPosition > 700.0f && walls.size() == 1) {
 			walls.push_back(Wall());

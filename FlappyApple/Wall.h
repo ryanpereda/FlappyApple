@@ -19,9 +19,9 @@ public:
 		hPosition = 0.0f;
 		std::random_device rd;
 		std::mt19937 gen(rd());
-		std::uniform_int_distribution<> distr(0, 600);
+		std::uniform_int_distribution<> distr(0, 550);
 		float rand = float(distr(gen));
-		rand -= 300.0f;
+		rand -= 275.0f;
 
 		float vertices[]{
 			// top wall
