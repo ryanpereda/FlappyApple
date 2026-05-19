@@ -16,7 +16,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void applyVMovement(glm::mat4 vMovement, int vMovementLoc);
+void applyVMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
 void applyGravity();
 
@@ -29,9 +29,9 @@ float lastFrame = 0.0f;
 float vVelocity = 0.0f;
 float vPosition = SCR_HEIGHT / 2;
 const float H_VELOCITY = 200.0f;
-const float GRAVITY = -500.0f;
-const float MAX_V_VELOCITY = 250.0f;
-const float MIN_V_VELOCITY = -250.0f;
+const float GRAVITY = -600.0f;
+const float MAX_V_VELOCITY = 300.0f;
+const float MIN_V_VELOCITY = -300.0f;
 
 int main() {
 	glfwInit();
@@ -73,6 +73,9 @@ int main() {
 
 	glm::mat4 hMovement = glm::mat4(1.0f);
 	int hMovementLoc = glGetUniformLocation(ourShader.ID, "hMovement");
+
+	glm::mat4 aRotate = glm::mat4(1.0f);
+	int aRotateLoc = glGetUniformLocation(ourShader.ID, "aRotate");
 	
 	
 	glm::mat4 projection;
@@ -97,7 +100,7 @@ int main() {
 		// texture units
 
 		// matrices
-		applyVMovement(vMovement, vMovementLoc);
+		applyVMovement(vMovement, vMovementLoc, aRotate, aRotateLoc);
 		applyGravity();
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
@@ -154,7 +157,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 }
 
-void applyVMovement(glm::mat4 vMovement, int vMovementLoc) {
+void applyVMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 aRotate, int aRotateLoc) {
 	vPosition += vVelocity * deltaTime;
 	if (vPosition < 32.0f) {
 		vPosition = 32.0f;
@@ -165,6 +168,13 @@ void applyVMovement(glm::mat4 vMovement, int vMovementLoc) {
 
 	vMovement = glm::translate(vMovement, glm::vec3(0.0f, -vPosition, 0.0f));
 	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
+
+	float rad = vVelocity / MAX_V_VELOCITY * 45.0f;
+	aRotate = glm::mat4(1.0f);
+	aRotate = glm::translate(aRotate, glm::vec3(640.0f, 720.0f, 0.0f));
+	aRotate = glm::rotate(aRotate, glm::radians(-rad), glm::vec3(0.0f, 0.0f, 1.0f));
+	aRotate = glm::translate(aRotate, glm::vec3(-640.0f, -720.0f, 0.0f));
+	glUniformMatrix4fv(aRotateLoc, 1, GL_FALSE, glm::value_ptr(aRotate));
 }
 
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall) {
