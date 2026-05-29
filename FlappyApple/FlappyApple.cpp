@@ -19,7 +19,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
 void applyGravity();
-bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate);
+bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -129,8 +129,8 @@ int main() {
 		glBindVertexArray(0);
 
 		for (int i = 0; i < walls.size(); i++) {
-			if (1300.0f - walls[i].hPosition >= 585.0f - 85.0f && 1300.0f - walls[i].hPosition <= 695.0f + 10.0f) {
-				checkCollision(ap, projection, vMovement, aRotate);
+			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
+				checkCollision(ap, projection, vMovement, aRotate, walls[i]);
 			}
 		}
 
@@ -202,7 +202,7 @@ void applyGravity() {
 	}
 }
 
-bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate) {
+bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall) {
 	glm::vec4 bottom_left = glm::vec4(ap.vertices[0], ap.vertices[1], 0.0f, 1.0f);
 	glm::vec4 top_left = glm::vec4(ap.vertices[6], ap.vertices[7], 0.0f, 1.0f);
 	glm::vec4 bottom_right = glm::vec4(ap.vertices[12], ap.vertices[13], 0.0f, 1.0f);
