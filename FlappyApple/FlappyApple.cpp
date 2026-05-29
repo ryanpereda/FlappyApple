@@ -16,9 +16,10 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void applyVMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 aRotate, int aRotateLoc);
+void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
 void applyGravity();
+bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -127,6 +128,12 @@ int main() {
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
+		for (int i = 0; i < walls.size(); i++) {
+			if (1300.0f - walls[i].hPosition >= 585.0f - 85.0f && 1300.0f - walls[i].hPosition <= 695.0f + 10.0f) {
+				checkCollision(ap, projection, vMovement, aRotate);
+			}
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -158,7 +165,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 	}
 }
 
-void applyVMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 aRotate, int aRotateLoc) {
+void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc) {
 	vPosition += vVelocity * deltaTime;
 	if (vPosition < 32.0f) {
 		vPosition = 32.0f;
@@ -167,6 +174,7 @@ void applyVMovement(glm::mat4 vMovement, int vMovementLoc, glm::mat4 aRotate, in
 		vPosition = 720.0f - 32.0f;
 	}
 
+	vMovement = glm::mat4(1.0f);
 	vMovement = glm::translate(vMovement, glm::vec3(0.0f, -vPosition, 0.0f));
 	glUniformMatrix4fv(vMovementLoc, 1, GL_FALSE, glm::value_ptr(vMovement));
 
@@ -192,4 +200,21 @@ void applyGravity() {
 	else {
 		vVelocity = MIN_V_VELOCITY;
 	}
+}
+
+bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate) {
+	glm::vec4 bottom_left = glm::vec4(ap.vertices[0], ap.vertices[1], 0.0f, 1.0f);
+	glm::vec4 top_left = glm::vec4(ap.vertices[6], ap.vertices[7], 0.0f, 1.0f);
+	glm::vec4 bottom_right = glm::vec4(ap.vertices[12], ap.vertices[13], 0.0f, 1.0f);
+	glm::vec4 top_right = glm::vec4(ap.vertices[18], ap.vertices[19], 0.0f, 1.0f);
+	bottom_left = vMovement * aRotate * bottom_left;
+	top_left = vMovement * aRotate * top_left;
+	bottom_right = vMovement * aRotate * bottom_right;
+	top_right = vMovement * aRotate * top_right;
+	std::cout << "Bottom Left: " << bottom_left.x << ", " << bottom_left.y << std::endl;
+	std::cout << "Top Left: " << top_left.x << ", " << top_left.y << std::endl;
+	std::cout << "Bottom Right: " << bottom_right.x << ", " << bottom_right.y << std::endl;
+	std::cout << "Top Right: " << top_right.x << ", " << top_right.y << std::endl;
+
+	return true;
 }

@@ -8,18 +8,20 @@
 class Apple {
 public:
 	unsigned int VAO, VBO, EBO;
+	float vertices[24];
 
 	Apple() {
 		float centerX = 640.0f;
 		float startingY = 720.0f;
 		float width = 72.0 / 2.0f; // also used for height
 
-		float vertices[]{
+		float temp[] = {
 			centerX - width, startingY + width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
 			centerX - width, startingY - width, 0.0f, 1.0f, 0.0f, 0.0f, // top left
 			centerX + width, startingY + width, 0.0f, 1.0f, 0.0f, 0.0f, // bottom right
 			centerX + width, startingY - width, 0.0f, 1.0f, 0.0f, 0.0f, // top right
 		};
+		memcpy(vertices, temp, sizeof(temp));
 
 		unsigned int indices[] = {
 			0, 1, 2, // first triangle
