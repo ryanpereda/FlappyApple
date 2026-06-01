@@ -17,7 +17,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
-void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
+void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall, bool game_active);
 void applyGravity();
 bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
 
@@ -115,21 +115,19 @@ int main() {
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
 		for (int i = 0; i < walls.size(); i++) {
-			if (game_active) {
-				applyHMovement(hMovement, hMovementLoc, walls[i]);
-			}
-			
+			applyHMovement(hMovement, hMovementLoc, walls[i], game_active);
 			
 			glBindVertexArray(walls[i].getVAO());
 			glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
+			if (walls[i].hPosition > 600.0f && walls.size() == i + 1) {
+				walls.push_back(Wall());
+			}
 		}
-		if (walls[0].hPosition > 1400.0f) {
+		if (walls[0].hPosition > 1375.0f) {
 			walls[0].deleteObjects();
 			walls.pop_front();
 		}
-		if (walls[0].hPosition > 700.0f && walls.size() == 1) {
-			walls.push_back(Wall());
-		}
+		
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 2);
 		glBindVertexArray(ap.getVAO());
@@ -140,6 +138,7 @@ int main() {
 			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
 				if (checkCollision(ap, vMovement, aRotate, walls[i])) {
 					game_active = false;
+					break;
 				}
 			}
 		}
@@ -196,8 +195,11 @@ void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, 
 	glUniformMatrix4fv(aRotateLoc, 1, GL_FALSE, glm::value_ptr(aRotate));
 }
 
-void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall) {
-	wall.hPosition += H_VELOCITY * deltaTime;
+void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall, bool game_active) {
+	if (game_active) {
+		wall.hPosition += H_VELOCITY * deltaTime;
+	}
+	
 
 	hMovement = glm::translate(hMovement, glm::vec3(-wall.hPosition, 0.0f, 0.0f));
 	glUniformMatrix4fv(hMovementLoc, 1, GL_FALSE, glm::value_ptr(hMovement));
