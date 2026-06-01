@@ -19,7 +19,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall);
 void applyGravity();
-bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
+bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -33,6 +33,8 @@ const float H_VELOCITY = 200.0f;
 const float GRAVITY = -600.0f;
 const float MAX_V_VELOCITY = 300.0f;
 const float MIN_V_VELOCITY = -300.0f;
+
+bool game_active = true;
 
 int main() {
 	glfwInit();
@@ -101,8 +103,11 @@ int main() {
 		// texture units
 
 		// matrices
-		applyVMovement(vMovement, vMovementLoc, aRotate, aRotateLoc);
-		applyGravity();
+		if (game_active) {
+			applyVMovement(vMovement, vMovementLoc, aRotate, aRotateLoc);
+			applyGravity();
+		}
+		
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 0);
 		glBindVertexArray(bg.getVAO());
@@ -110,7 +115,10 @@ int main() {
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
 		for (int i = 0; i < walls.size(); i++) {
-			applyHMovement(hMovement, hMovementLoc, walls[i]);
+			if (game_active) {
+				applyHMovement(hMovement, hMovementLoc, walls[i]);
+			}
+			
 			
 			glBindVertexArray(walls[i].getVAO());
 			glDrawArrays(GL_TRIANGLES, 0, 12); // draw elements
@@ -130,7 +138,9 @@ int main() {
 
 		for (int i = 0; i < walls.size(); i++) {
 			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
-				checkCollision(ap, projection, vMovement, aRotate, walls[i]);
+				if (checkCollision(ap, vMovement, aRotate, walls[i])) {
+					game_active = false;
+				}
 			}
 		}
 
@@ -202,19 +212,159 @@ void applyGravity() {
 	}
 }
 
-bool checkCollision(Apple ap, glm::mat4 projection, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall) {
-	glm::vec4 bottom_left = glm::vec4(ap.vertices[0], ap.vertices[1], 0.0f, 1.0f);
-	glm::vec4 top_left = glm::vec4(ap.vertices[6], ap.vertices[7], 0.0f, 1.0f);
-	glm::vec4 bottom_right = glm::vec4(ap.vertices[12], ap.vertices[13], 0.0f, 1.0f);
-	glm::vec4 top_right = glm::vec4(ap.vertices[18], ap.vertices[19], 0.0f, 1.0f);
-	bottom_left = vMovement * aRotate * bottom_left;
-	top_left = vMovement * aRotate * top_left;
-	bottom_right = vMovement * aRotate * bottom_right;
-	top_right = vMovement * aRotate * top_right;
-	std::cout << "Bottom Left: " << bottom_left.x << ", " << bottom_left.y << std::endl;
-	std::cout << "Top Left: " << top_left.x << ", " << top_left.y << std::endl;
-	std::cout << "Bottom Right: " << bottom_right.x << ", " << bottom_right.y << std::endl;
-	std::cout << "Top Right: " << top_right.x << ", " << top_right.y << std::endl;
+bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall) {
+	glm::vec4 ap_bottom_left = glm::vec4(ap.vertices[0], ap.vertices[1], 0.0f, 1.0f);
+	glm::vec4 ap_top_left = glm::vec4(ap.vertices[6], ap.vertices[7], 0.0f, 1.0f);
+	glm::vec4 ap_bottom_right = glm::vec4(ap.vertices[12], ap.vertices[13], 0.0f, 1.0f);
+	glm::vec4 ap_top_right = glm::vec4(ap.vertices[18], ap.vertices[19], 0.0f, 1.0f);
+	ap_bottom_left = vMovement * aRotate * ap_bottom_left;
+	ap_top_left = vMovement * aRotate * ap_top_left;
+	ap_bottom_right = vMovement * aRotate * ap_bottom_right;
+	ap_top_right = vMovement * aRotate * ap_top_right;
+	glm::vec2 top_wall_bottom_left = glm::vec2(1300.0f - wall.hPosition, wall.minY + wall.height + wall.rand);
+	glm::vec2 top_wall_bottom_right = glm::vec2(1375.0f - wall.hPosition, wall.minY + wall.height + wall.rand);
+	glm::vec2 bottom_wall_top_left = glm::vec2(1300.0f - wall.hPosition, wall.maxY - wall.height + wall.rand);
+	glm::vec2 bottom_wall_top_right = glm::vec2(1375.0f - wall.hPosition, wall.maxY - wall.height + wall.rand);
 
-	return true;
+	// check if all y coordinates are in the bounds of the open space
+	if (ap_top_left.y > top_wall_bottom_left.y && ap_top_right.y > top_wall_bottom_left.y 
+		&& ap_bottom_left.y < bottom_wall_top_left.y && ap_bottom_right.y < bottom_wall_top_left.y) {
+		std::cout << "No Collision Detected!" << std::endl;
+		return false;
+	}
+	else {
+		// check if all coordinate x values are outside the bounds of the open space
+		if ((ap_top_left.x > top_wall_bottom_right.x || ap_top_right.x < top_wall_bottom_left.x) 
+			&& (ap_bottom_left.x > bottom_wall_top_right.x || ap_bottom_right.x < bottom_wall_top_left.x)) {
+			return false;
+		}
+		else {
+			// check if any corner is clipping into the walls
+			if ((ap_top_left.x <= top_wall_bottom_right.x && ap_top_left.x >= top_wall_bottom_left.x && (ap_top_left.y <= top_wall_bottom_right.y || ap_top_left.y >= bottom_wall_top_right.y)) ||
+				(ap_top_right.x <= top_wall_bottom_right.x && ap_top_right.x >= top_wall_bottom_left.x && (ap_top_right.y <= top_wall_bottom_right.y || ap_top_right.y >= bottom_wall_top_right.y)) ||
+				(ap_bottom_left.x <= top_wall_bottom_right.x && ap_bottom_left.x >= top_wall_bottom_left.x && (ap_bottom_left.y >= bottom_wall_top_right.y || ap_bottom_left.y <= top_wall_bottom_right.y)) ||
+				(ap_bottom_right.x <= top_wall_bottom_right.x && ap_bottom_right.x >= top_wall_bottom_left.x && (ap_bottom_right.y >= bottom_wall_top_right.y || ap_bottom_right.y <= top_wall_bottom_right.y))) {
+				std::cout << "Collision Detected!" << std::endl;
+
+
+				return true;
+			}
+			else {
+				glm::vec2 v1;
+				glm::vec2 v2;
+				glm::vec2 v3;
+				// check if apple is going up or down
+				if (ap_top_left.y > ap_top_right.y) {
+					if (ap_top_right.y < top_wall_bottom_left.y && ap_top_right.x < top_wall_bottom_left.x) {
+						v1 = glm::vec2(ap_bottom_right.x - ap_top_right.x, ap_bottom_right.y - ap_top_right.y);
+						v2 = glm::vec2(top_wall_bottom_left.x - ap_top_right.x, top_wall_bottom_left.y - ap_top_right.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y > 0) {
+							std::cout << "COLLISION DECTECTED" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else if (ap_top_right.y < top_wall_bottom_left.y && ap_top_right.x > top_wall_bottom_right.x){
+						v1 = glm::vec2(ap_top_left.x - ap_top_right.x, ap_top_left.y - ap_top_right.y);
+						v2 = glm::vec2(top_wall_bottom_right.x - ap_top_right.x, top_wall_bottom_right.y - ap_top_right.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y > 0) {
+							std::cout << "COLLISION DECTECTED" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else if (ap_bottom_left.y > bottom_wall_top_left.y && ap_bottom_left.x < bottom_wall_top_left.x) {
+						v1 = glm::vec2(ap_bottom_right.x - ap_bottom_left.x, ap_bottom_right.y - ap_bottom_left.y);
+						v2 = glm::vec2(bottom_wall_top_left.x - ap_bottom_left.x, bottom_wall_top_left.y - ap_bottom_left.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y < 0) {
+							std::cout << "COLLISION DECTECTED" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else if (ap_bottom_left.y > bottom_wall_top_left.y && ap_bottom_left.x > bottom_wall_top_right.x) {
+						v1 = glm::vec2(ap_top_left.x - ap_bottom_left.x, ap_top_left.y - ap_bottom_left.y);
+						v2 = glm::vec2(bottom_wall_top_right.x - ap_bottom_left.x, bottom_wall_top_right.y - ap_bottom_left.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y < 0) {
+							std::cout << "COLLISION DECTECTED" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else {
+						std::cout << "else" << std::endl;
+						return false;
+					}
+				}
+				else {
+					if (ap_top_left.y < top_wall_bottom_left.y && ap_top_left.x < top_wall_bottom_left.x) {
+						v1 = glm::vec2(ap_top_right.x - ap_top_left.x, ap_top_right.y - ap_top_left.y);
+						v2 = glm::vec2(top_wall_bottom_left.x - ap_top_left.x, top_wall_bottom_left.y - ap_top_left.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y > 0) {
+							std::cout << "COLLISION DECTECTED2" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else if (ap_bottom_right.y > bottom_wall_top_left.y && ap_bottom_right.x < bottom_wall_top_left.x) {
+						v1 = glm::vec2(ap_top_right.x - ap_bottom_right.x, ap_top_right.y - ap_bottom_right.y);
+						v2 = glm::vec2(bottom_wall_top_left.x - ap_bottom_right.x, bottom_wall_top_left.y - ap_bottom_right.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y < 0) {
+							std::cout << "COLLISION DECTECTED2" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else if (ap_bottom_right.y > bottom_wall_top_left.y && ap_bottom_right.x > bottom_wall_top_right.x) {
+						v1 = glm::vec2(ap_bottom_left.x - ap_bottom_right.x, ap_bottom_left.y - ap_bottom_right.y);
+						v2 = glm::vec2(bottom_wall_top_right.x - ap_bottom_right.x, bottom_wall_top_right.y - ap_bottom_right.y);
+						v1 = v1 / glm::length(v1);
+						v2 = v2 / glm::length(v2);
+						v3 = v2 - v1;
+						if (v3.y < 0) {
+							std::cout << "COLLISION DECTECTED2" << std::endl;
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					else {
+						std::cout << "else" << std::endl;
+						return false;
+					}
+				}
+			}
+		}
+	}
 }

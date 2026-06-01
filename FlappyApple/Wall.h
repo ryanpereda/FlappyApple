@@ -9,29 +9,33 @@ class Wall {
 public:
 	unsigned int VAO, VBO;
 	float hPosition;
+	float rand;
+	float height;
+	float minY;
+	float maxY;
 
 	Wall() {
 		float width = 75.0f;
 		float coordX = 1300.0f;
-		float minY = 0.0f;
-		float maxY = 720.0f;
-		float height = 360.0f - 125.0f;
+		minY = 0.0f;
+		maxY = 720.0f;
+		height = 360.0f - 125.0f;
 		hPosition = 0.0f;
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_int_distribution<> distr(0, 550);
-		float rand = float(distr(gen));
+		rand = float(distr(gen));
 		rand -= 275.0f;
 
 		float vertices[]{
 			// top wall
-			coordX, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
-			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
-			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+			coordX, minY, 0.0f, 0.0f, 1.0f, 0.0f, // top left
+			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // top right
 
-			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top left
-			coordX + width, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // top right
-			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+			coordX, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
+			coordX + width, minY + height + rand, 0.0f, 0.0f, 1.0f, 0.0f, // bottom right
+			coordX + width, minY, 0.0f, 0.0f, 1.0f, 0.0f, // top right
 
 			// bottom wall
 			coordX, maxY, 0.0f, 0.0f, 1.0f, 0.0f, // bottom left
