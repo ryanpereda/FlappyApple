@@ -256,8 +256,6 @@ bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall)
 				(ap_top_right.x <= top_wall_bottom_right.x && ap_top_right.x >= top_wall_bottom_left.x && (ap_top_right.y <= top_wall_bottom_right.y || ap_top_right.y >= bottom_wall_top_right.y)) ||
 				(ap_bottom_left.x <= top_wall_bottom_right.x && ap_bottom_left.x >= top_wall_bottom_left.x && (ap_bottom_left.y >= bottom_wall_top_right.y || ap_bottom_left.y <= top_wall_bottom_right.y)) ||
 				(ap_bottom_right.x <= top_wall_bottom_right.x && ap_bottom_right.x >= top_wall_bottom_left.x && (ap_bottom_right.y >= bottom_wall_top_right.y || ap_bottom_right.y <= top_wall_bottom_right.y))) {
-				std:: << "Collision Detected!" << std::endl;
-
 
 				return true;
 			}
