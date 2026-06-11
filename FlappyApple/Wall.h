@@ -13,6 +13,7 @@ public:
 	float height;
 	float minY;
 	float maxY;
+	bool pointGiven;
 
 	Wall() {
 		float width = 75.0f;
@@ -26,6 +27,7 @@ public:
 		std::uniform_int_distribution<> distr(0, 550);
 		rand = float(distr(gen));
 		rand -= 275.0f;
+		pointGiven = false;
 
 		float vertices[]{
 			// top wall

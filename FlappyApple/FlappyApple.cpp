@@ -35,6 +35,7 @@ const float MAX_V_VELOCITY = 300.0f;
 const float MIN_V_VELOCITY = -300.0f;
 
 bool game_active = true;
+int points = 0;
 
 int main() {
 	glfwInit();
@@ -151,6 +152,11 @@ int main() {
 					game_active = false;
 					break;
 				}
+			}
+			else if (1300.0f - walls[i].hPosition < 585.0f - 75.0f && !walls[i].pointGiven) {
+				points++;
+				walls[i].pointGiven = true;
+				std::cout << points << std::endl;
 			}
 		}
 
