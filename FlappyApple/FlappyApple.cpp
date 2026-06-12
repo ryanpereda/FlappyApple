@@ -19,6 +19,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall, bool game_active);
 void applyGravity();
+void checkScore();
 bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
 
 const unsigned int SCR_WIDTH = 1280;
@@ -34,8 +35,10 @@ const float GRAVITY = -600.0f;
 const float MAX_V_VELOCITY = 300.0f;
 const float MIN_V_VELOCITY = -300.0f;
 
-bool game_active = true;
-int points = 0;
+bool game_active = false;
+int score = 0;
+int high_score = 0;
+bool first_frame = true;
 
 int main() {
 	glfwInit();
@@ -95,6 +98,10 @@ int main() {
 		processInput(window);
 		glfwSetKeyCallback(window, keyCallback);
 
+		if (first_frame) {
+			walls[0].hPosition += 50;
+		}
+
 		glClearColor(0, 0, 0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -104,7 +111,7 @@ int main() {
 		// texture units
 
 		// matrices
-		if (game_active) {
+		if (game_active || first_frame) {
 			applyVMovement(vMovement, vMovementLoc, aRotate, aRotateLoc);
 			applyGravity();
 		}
@@ -115,7 +122,7 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 6); // draw elements
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 1);
-		if (game_active) {
+		if (game_active || first_frame) {
 			for (int i = 0; i < walls.size(); i++) {
 				applyHMovement(hMovement, hMovementLoc, walls[i], game_active);
 			
@@ -154,11 +161,13 @@ int main() {
 				}
 			}
 			else if (1300.0f - walls[i].hPosition < 585.0f - 75.0f && !walls[i].pointGiven) {
-				points++;
+				score++;
 				walls[i].pointGiven = true;
-				std::cout << points << std::endl;
+				std::cout << score << std::endl;
 			}
 		}
+
+		first_frame = false;
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -166,6 +175,9 @@ int main() {
 	}
 	bg.deleteObjects();
 	ap.deleteObjects();
+	for (int i = 0; i < walls.size(); i++) {
+		walls[i].deleteObjects();
+	}
 
 	glfwTerminate();
 
@@ -180,10 +192,21 @@ void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		vVelocity = 0.0f;
+		vPosition = SCR_HEIGHT / 2;
+		game_active = false;
+		first_frame = true;
+		checkScore();
+		score = 0;
+	}
 }
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		if (!game_active) {
+			game_active = true;
+		}
 		vVelocity += -GRAVITY;
 		if (vVelocity > MAX_V_VELOCITY) {
 			vVelocity = MAX_V_VELOCITY;
@@ -228,6 +251,12 @@ void applyGravity() {
 	}
 	else {
 		vVelocity = MIN_V_VELOCITY;
+	}
+}
+
+void checkScore() {
+	if (score > high_score) {
+		high_score = score;
 	}
 }
 
