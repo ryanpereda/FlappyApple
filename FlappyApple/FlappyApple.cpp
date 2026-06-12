@@ -14,7 +14,7 @@
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, std::deque <Wall> &walls);
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void applyVMovement(glm::mat4 &vMovement, int vMovementLoc, glm::mat4 &aRotate, int aRotateLoc);
 void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall, bool game_active);
@@ -39,6 +39,7 @@ bool game_active = false;
 int score = 0;
 int high_score = 0;
 bool first_frame = true;
+bool game_over = false;
 
 int main() {
 	glfwInit();
@@ -95,7 +96,7 @@ int main() {
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		processInput(window);
+		processInput(window, walls);
 		glfwSetKeyCallback(window, keyCallback);
 
 		if (first_frame) {
@@ -157,6 +158,7 @@ int main() {
 			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
 				if (checkCollision(ap, vMovement, aRotate, walls[i])) {
 					game_active = false;
+					game_over = true;
 					break;
 				}
 			}
@@ -188,17 +190,27 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, std::deque<Wall> &walls) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		vVelocity = 0.0f;
-		vPosition = SCR_HEIGHT / 2;
-		game_active = false;
-		first_frame = true;
-		checkScore();
-		score = 0;
+		if (game_active || game_over) {
+			vVelocity = 0.0f;
+			vPosition = SCR_HEIGHT / 2;
+			game_active = false;
+			first_frame = true;
+			game_over = false;
+			checkScore();
+			score = 0;
+			std::cout << "High Score: " << high_score << std::endl;
+			for (int i = 0; i < walls.size(); i++) {
+				walls[i].deleteObjects();
+			}
+			walls.clear();
+			walls.push_back(Wall());
+		}
+		
 	}
 }
 
