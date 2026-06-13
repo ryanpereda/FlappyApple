@@ -12,6 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, std::deque <Wall> &walls);
@@ -21,6 +23,7 @@ void applyHMovement(glm::mat4 hMovement, int hMovementLoc, Wall &wall, bool game
 void applyGravity();
 void checkScore();
 bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall);
+bool checkFloorCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate);
 
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -162,7 +165,14 @@ int main() {
 					break;
 				}
 			}
-			else if (1300.0f - walls[i].hPosition < 585.0f - 75.0f && !walls[i].pointGiven) {
+			else {
+				if (checkFloorCollision(ap, vMovement, aRotate)) {
+					game_active = false;
+					game_over = true;
+					break;
+				}
+			}
+			if (1300.0f - walls[i].hPosition < 585.0f - 75.0f && !walls[i].pointGiven) {
 				score++;
 				walls[i].pointGiven = true;
 				std::cout << score << std::endl;
@@ -281,6 +291,10 @@ bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall)
 	ap_top_left = vMovement * aRotate * ap_top_left;
 	ap_bottom_right = vMovement * aRotate * ap_bottom_right;
 	ap_top_right = vMovement * aRotate * ap_top_right;
+	if (ap_bottom_right.y >= 720.0f || ap_bottom_left.y >= 720.0f) {
+		return true;
+	}
+
 	glm::vec2 top_wall_bottom_left = glm::vec2(1300.0f - wall.hPosition, wall.minY + wall.height + wall.rand);
 	glm::vec2 top_wall_bottom_right = glm::vec2(1375.0f - wall.hPosition, wall.minY + wall.height + wall.rand);
 	glm::vec2 bottom_wall_top_left = glm::vec2(1300.0f - wall.hPosition, wall.maxY - wall.height + wall.rand);
@@ -415,4 +429,15 @@ bool checkCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate, Wall wall)
 			}
 		}
 	}
+}
+
+bool checkFloorCollision(Apple ap, glm::mat4 vMovement, glm::mat4 aRotate) {
+	glm::vec4 ap_bottom_left = glm::vec4(ap.vertices[0], ap.vertices[1], 0.0f, 1.0f);
+	glm::vec4 ap_bottom_right = glm::vec4(ap.vertices[12], ap.vertices[13], 0.0f, 1.0f);
+	ap_bottom_left = vMovement * aRotate * ap_bottom_left;
+	ap_bottom_right = vMovement * aRotate * ap_bottom_right;
+	if (ap_bottom_right.y >= 720.0f || ap_bottom_left.y >= 720.0f) {
+		return true;
+	}
+	return false;
 }
