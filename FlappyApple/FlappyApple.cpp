@@ -7,6 +7,7 @@
 #include "Background.h"
 #include "Apple.h"
 #include "Wall.h"
+#include "Text.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -75,6 +76,7 @@ int main() {
 	Apple ap;
 	std::deque<Wall> walls;
 	walls.push_back(Wall());
+	Text text;
 
 	ourShader.use();
 
