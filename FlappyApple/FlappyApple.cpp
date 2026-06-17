@@ -71,6 +71,7 @@ int main() {
 
 	// shader class here
 	Shader ourShader("shader.vs", "shader.fs");
+	Shader textShader("textShader.vs", "textShader.fs");
 
 	Background bg;
 	Apple ap;
@@ -78,6 +79,7 @@ int main() {
 	walls.push_back(Wall());
 	Text text;
 
+	textShader.use();
 	ourShader.use();
 
 	glm::mat4 vMovement = glm::mat4(1.0f);
@@ -95,6 +97,8 @@ int main() {
 	projection = glm::ortho(0.0f, float(SCR_WIDTH), float(SCR_HEIGHT), 0.0f, -1.0f, 1.0f);
 	int projectionLoc = glGetUniformLocation(ourShader.ID, "projection");
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+	glUniformMatrix4fv(glGetUniformLocation(textShader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -161,6 +165,8 @@ int main() {
 		glBindVertexArray(ap.getVAO());
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+
+		text.renderText(textShader, "Apple Oranges,", 100.0f, 100.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		for (int i = 0; i < walls.size(); i++) {
 			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
