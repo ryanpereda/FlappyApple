@@ -177,11 +177,11 @@ int main() {
 			s = "R - Reset";
 			text.renderText(ourShader, s, 555.0f, 300.0f, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 		}
-		else if (!game_over) {
+		else {
 			s = "R - Reset";
 			text.renderText(ourShader, s, 1072.0f, 85.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
 		}
-		else if (!game_active && !game_over) {
+		if (!game_active && !game_over) {
 			s = "Space to Start and Jump";
 			text.renderText(ourShader, s, 450.0f, 255.0f, 0.75f, glm::vec3(0.0f, 0.0f, 0.0f));
 		}
