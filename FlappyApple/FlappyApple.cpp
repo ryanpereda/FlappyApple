@@ -161,13 +161,37 @@ int main() {
 		glBindVertexArray(0);
 
 		glUniform1i(glGetUniformLocation(ourShader.ID, "obj"), 3);
-		text.renderText(ourShader, "Apple Oranges,", 100.0f, 100.0f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f));
+		std::string s = "Score: " + std::to_string(score);
+		text.renderText(ourShader, s, 0.0f, 40.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+
+		s = "High Score: " + std::to_string(high_score);
+		text.renderText(ourShader, s, 0.0f, 85.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+
+		s = "ESC - Quit";
+		text.renderText(ourShader, s, 1045.0f, 40.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+
+		if (game_over) {
+			s = "Game Over";
+			text.renderText(ourShader, s, 530.0f, 255.0f, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+
+			s = "R - Reset";
+			text.renderText(ourShader, s, 555.0f, 300.0f, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+		}
+		else if (!game_over) {
+			s = "R - Reset";
+			text.renderText(ourShader, s, 1072.0f, 85.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+		}
+		else if (!game_active && !game_over) {
+			s = "Space to Start and Jump";
+			text.renderText(ourShader, s, 450.0f, 255.0f, 0.75f, glm::vec3(0.0f, 0.0f, 0.0f));
+		}
 
 		for (int i = 0; i < walls.size(); i++) {
 			if (1300.0f - walls[i].hPosition >= 585.0f - 75.0f && 1375.0f - walls[i].hPosition <= 695.0f + 75.0f) {
 				if (checkCollision(ap, vMovement, aRotate, walls[i])) {
 					game_active = false;
 					game_over = true;
+					checkScore();
 					break;
 				}
 			}
@@ -175,13 +199,13 @@ int main() {
 				if (checkFloorCollision(ap, vMovement, aRotate)) {
 					game_active = false;
 					game_over = true;
+					checkScore();
 					break;
 				}
 			}
 			if (1300.0f - walls[i].hPosition < 585.0f - 75.0f && !walls[i].pointGiven) {
 				score++;
 				walls[i].pointGiven = true;
-				std::cout << score << std::endl;
 			}
 		}
 
@@ -219,7 +243,6 @@ void processInput(GLFWwindow* window, std::deque<Wall> &walls) {
 			game_over = false;
 			checkScore();
 			score = 0;
-			std::cout << "High Score: " << high_score << std::endl;
 			for (int i = 0; i < walls.size(); i++) {
 				walls[i].deleteObjects();
 			}
