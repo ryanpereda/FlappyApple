@@ -45,8 +45,6 @@
   <ItemGroup>
     <None Include="shader.fs" />
     <None Include="shader.vs" />
-    <None Include="textShader.fs" />
-    <None Include="textShader.vs" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FlappyApple.rc">
